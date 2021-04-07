@@ -1,4 +1,4 @@
-import { MongooseModule } from '@nestjs/mongoose';
+import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductModule } from './product.module';
 import { Product, ProductSchema } from './product.schema';
@@ -9,14 +9,13 @@ describe('ProductService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        MongooseModule.forFeature([
-          { name: Product.name, schema: ProductSchema },
-        ]),
-        ProductModule,
-        MongooseModule.forRoot(config.mongoUri),
+      providers: [
+        ProductService,
+        {
+          provide: getModelToken(Product.name),
+          useValue: {},
+        },
       ],
-      providers: [ProductService],
     }).compile();
 
     service = module.get<ProductService>(ProductService);
