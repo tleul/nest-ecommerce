@@ -61,4 +61,48 @@ export class UserService {
       return productcheck;
     }
   }
+
+  async deleteItem(userId: string, productId: string) {
+    let user = await this.userModel.findById(userId).populate('cart.productId');
+    if (!user) throw new NotFoundException('User Not Found');
+
+    let itemIndex = user.cart.findIndex(
+      (item: any) => item.productId._id.toString() === productId.toString(),
+    );
+    if (itemIndex >= 0) {
+      user.cart.splice(itemIndex, 1);
+      user = await user.save();
+      return user;
+    } else {
+      throw new NotFoundException('Product Not Exist');
+    }
+  }
+  async incrementQty(userId: string, productId: string) {
+    let user = await this.userModel.findById(userId).populate('cart.productId');
+    if (!user) throw new NotFoundException('User Not Found');
+    let itemIndex = user.cart.findIndex(
+      (item: any) => item.productId._id.toString() === productId.toString(),
+    );
+    if (itemIndex >= 0) {
+      user.cart[itemIndex].qty++;
+      user = await user.save();
+      return user;
+    } else {
+      throw new NotFoundException('Product Not Exist');
+    }
+  }
+  async decerementQty(userId: string, productId: string) {
+    let user = await this.userModel.findById(userId).populate('cart.productId');
+    if (!user) throw new NotFoundException('User Not Found');
+    let itemIndex = user.cart.findIndex(
+      (item: any) => item.productId._id.toString() === productId.toString(),
+    );
+    if (itemIndex >= 0) {
+      user.cart[itemIndex].qty > 1 && user.cart[itemIndex].qty--;
+      user = await user.save();
+      return user;
+    } else {
+      throw new NotFoundException('Product Not Exist');
+    }
+  }
 }

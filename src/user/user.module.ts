@@ -11,7 +11,19 @@ import { UserService } from './user.service';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeatureAsync([
+      {
+        name: User.name,
+
+        useFactory: () => {
+          const schema = UserSchema;
+          schema.pre('save', function () {
+            console.log('It is Saving or Saved');
+          });
+          return schema;
+        },
+      },
+    ]),
   ],
   providers: [UserService],
   controllers: [UserController],
